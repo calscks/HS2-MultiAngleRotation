@@ -9,6 +9,7 @@ namespace AIMultiAngleRotation
 {
     [BepInPlugin(GUID, PluginName, Version)]
     [BepInDependency(KoikatuAPI.GUID, KoikatuAPI.VersionConst)]
+    [BepInProcess("StudioNEOV2")]
     public partial class AIMultiAngleRotation : BaseUnityPlugin
     {
         //thanks to 雨宮様 http://playclubphotographs.blog.fc2.com/blog-entry-474.html and RM50様 http://rm50.blog.fc2.com/blog-entry-2.html
@@ -57,8 +58,8 @@ namespace AIMultiAngleRotation
                 {
                     z = 360 - z;
                 }
-
-                CameraAngle = new Vector3(CameraAngle.x, 180f, CameraAngle.z + z);
+                Vector3 angle = new Vector3(CameraAngle.x, 180f, CameraAngle.z + z);
+                CameraAngle = angle;
             }
             else if (Input.GetKeyDown(KeyCode.F7))
             {
@@ -67,8 +68,8 @@ namespace AIMultiAngleRotation
                 {
                     y = 180 - y;
                 }
-
-                CameraAngle = new Vector3(CameraAngle.x, CameraAngle.y + y, CameraAngle.z);
+                Vector3 angle = new Vector3(CameraAngle.x, CameraAngle.y + y, CameraAngle.z);
+                CameraAngle = angle;
             }
             else if (Input.GetKeyDown(KeyCode.F8))
             {
@@ -77,8 +78,8 @@ namespace AIMultiAngleRotation
                 {
                     y = 360 - y;
                 }
-
-                CameraAngle = new Vector3(CameraAngle.x, CameraAngle.y + y, CameraAngle.z);
+                Vector3 angle = new Vector3(CameraAngle.x, CameraAngle.y + y, CameraAngle.z);
+                CameraAngle = angle;
             }
         }
         private Studio.CameraControl CameraControl => (Studio.CameraControl)Camera.main.GetComponent<CinemachineBrain>().ActiveVirtualCamera;
