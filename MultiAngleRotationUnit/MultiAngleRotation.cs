@@ -21,11 +21,10 @@ namespace HS2MultiAngleRotation
         public static ConfigEntry<KeyboardShortcut> ConfigKey2 { get; private set; }
         public static ConfigEntry<KeyboardShortcut> ConfigKey3 { get; private set; }
         public static ConfigEntry<KeyboardShortcut> ConfigKeyC1 { get; private set; }
-        public static ConfigEntry<KeyboardShortcut> ConfigKeyC2 { get; private set; }
         public static ConfigEntry<KeyboardShortcut> ConfigKeyC3 { get; private set; }
         public static ConfigEntry<float> RollAngle { get; private set; }
-        public static ConfigEntry<float> YawAngle { get; private set; }
-        public static ConfigEntry<float> PitchAngle { get; private set; }
+        public static ConfigEntry<float> FrontBackAngle { get; private set; }
+        public static ConfigEntry<float> SideAngle { get; private set; }
 
         private const KeyCode Ctrl = KeyCode.LeftControl;
         private const KeyCode F4 = KeyCode.F4;
@@ -56,17 +55,16 @@ namespace HS2MultiAngleRotation
                         return false;
                 }
             });
-            ConfigKey1 = Config.Bind("Config", "1. Roll (clockwise)", new KeyboardShortcut(F4), new ConfigDescription("Keyboard Shortcut"));
-            ConfigKey2 = Config.Bind("Config", "2. Yaw (clockwise)", new KeyboardShortcut(F6), new ConfigDescription("Keyboard Shortcut"));
-            ConfigKey3 = Config.Bind("Config", "3. Pitch (clockwise)", new KeyboardShortcut(F7), new ConfigDescription("Keyboard Shortcut"));
+            ConfigKey1 = Config.Bind("Roll", "1. Roll (clockwise)", new KeyboardShortcut(F4), new ConfigDescription("Keyboard Shortcut"));
+            ConfigKey2 = Config.Bind("Front/Back", "2. Front/Back", new KeyboardShortcut(F6), new ConfigDescription("Keyboard Shortcut"));
+            ConfigKey3 = Config.Bind("Side", "3. Side (clockwise)", new KeyboardShortcut(F7), new ConfigDescription("Keyboard Shortcut"));
             
-            ConfigKeyC1 = Config.Bind("Config", "1. Roll (counter-clockwise)", new KeyboardShortcut(F4, Ctrl), new ConfigDescription("Keyboard Shortcut"));
-            ConfigKeyC2 = Config.Bind("Config", "2. Yaw (counter-clockwise)", new KeyboardShortcut(F6, Ctrl), new ConfigDescription("Keyboard Shortcut"));
-            ConfigKeyC3 = Config.Bind("Config", "3. Pitch (counter-clockwise)", new KeyboardShortcut(F7, Ctrl), new ConfigDescription("Keyboard Shortcut"));
+            ConfigKeyC1 = Config.Bind("Roll", "1. Roll (counter-clockwise)", new KeyboardShortcut(F4, Ctrl), new ConfigDescription("Keyboard Shortcut"));
+            ConfigKeyC3 = Config.Bind("Side", "3. Side (counter-clockwise)", new KeyboardShortcut(F7, Ctrl), new ConfigDescription("Keyboard Shortcut"));
             
-            RollAngle = Config.Bind("Config", "1. Roll Angle", Key1Default, new ConfigDescription("Angle", new AcceptableValueRange<float>(Key1Min, Key1Max)));
-            YawAngle = Config.Bind("Config", "2. Yaw Angle", Key2Default, new ConfigDescription("Angle", new AcceptableValueRange<float>(Key2Min, Key2Max)));
-            PitchAngle = Config.Bind("Config", "3. Pitch Angle", Key3Default, new ConfigDescription("Angle", new AcceptableValueRange<float>(Key3Min, Key3Max)));
+            RollAngle = Config.Bind("Roll", "1. Roll Angle", Key1Default, new ConfigDescription("Angle", new AcceptableValueRange<float>(Key1Min, Key1Max)));
+            FrontBackAngle = Config.Bind("Front/Back", "2. Front/Back Angle (leave this be)", Key2Default, new ConfigDescription("Angle", new AcceptableValueRange<float>(Key2Min, Key2Max)));
+            SideAngle = Config.Bind("Side", "3. Side Angle", Key3Default, new ConfigDescription("Angle", new AcceptableValueRange<float>(Key3Min, Key3Max)));
         }
 
         private void Update()
@@ -81,19 +79,15 @@ namespace HS2MultiAngleRotation
             }
             else if (ConfigKey2.Value.IsDown())
             {
-                Yaw();
-            }
-            else if (ConfigKeyC2.Value.IsDown())
-            {
-                Yaw(false);
+                Yaw180();
             }
             else if (ConfigKey3.Value.IsDown())
             {
-                Pitch();
+                Yaw();
             }
             else if (ConfigKeyC3.Value.IsDown())
             {
-                Pitch(false);
+                Yaw(false);
             }
         }
 
@@ -108,20 +102,16 @@ namespace HS2MultiAngleRotation
             CameraAngle = angle;
         }
 
-        private void Yaw(bool clockwise = true)
+        private void Yaw180()
         {
-            float y = YawAngle.Value;
-            if (!clockwise)
-            {
-                y = 180 - y;
-            }
+            float y = FrontBackAngle.Value;
             Vector3 angle = new Vector3(CameraAngle.x, CameraAngle.y + y, CameraAngle.z);
             CameraAngle = angle;
         }
 
-        private void Pitch(bool clockwise = true)
+        private void Yaw(bool clockwise = true)
         {
-            float y = PitchAngle.Value;
+            float y = SideAngle.Value;
             if (!clockwise)
             {
                 y = 360 - y;
