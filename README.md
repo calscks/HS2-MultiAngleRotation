@@ -1,7 +1,7 @@
 # HS2 MultiAngleRotation
 Multi angle viewport rotation plugin for Honey Select 2's Studio.
 
-Makes it easier to rotate the viewport's roll/yaw/pitch positions by user-defined angles, via user-configured key combinations.
+Makes it easier to rotate the view positions (rolling, front/back, side) by user-defined angles, via user-configured key combinations.
 
 Major credits to:
 - [**ore-**](https://github.com/ore-) for their AI MultiAngleRotation plugin.
