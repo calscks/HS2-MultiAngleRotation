@@ -16,7 +16,7 @@ namespace HS2MultiAngleRotation
         //thanks to 雨宮様 http://playclubphotographs.blog.fc2.com/blog-entry-474.html and RM50様 http://rm50.blog.fc2.com/blog-entry-2.html
         public const string GUID = "hs2.multianglerotation";
         public const string PluginName = "HS2 MultiAngleRotation";
-        public const string Version = "1.0.0";
+        public const string Version = "1.0.1";
 
         public static ConfigEntry<KeyboardShortcut> ConfigKey1 { get; private set; }
         public static ConfigEntry<KeyboardShortcut> ConfigKey2 { get; private set; }
