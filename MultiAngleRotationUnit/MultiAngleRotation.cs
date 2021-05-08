@@ -126,7 +126,7 @@ namespace HS2MultiAngleRotation
         private void Yaw(bool clockwise = true)
         {
             float y = SideAngle.Value;
-            if (!clockwise)
+            if (clockwise)
             {
                 y = 360 - y;
             }
