@@ -1,4 +1,5 @@
-﻿using BepInEx;
+﻿using System;
+using BepInEx;
 using BepInEx.Configuration;
 using Cinemachine;
 using KKAPI;
@@ -40,7 +41,8 @@ namespace HS2MultiAngleRotation
         private const float Key3Max = 360f;
         private const float Key3Default = 90f;
 
-        private Vector3 cameraAngle = new Vector3(0f, 0f, 0f);
+        private Vector3 _cameraAngle = new Vector3(0f, 0f, 0f);
+
         private IEnumerator Start()
         {
             yield return new WaitUntil(() =>
@@ -49,22 +51,33 @@ namespace HS2MultiAngleRotation
                 {
                     case GameMode.Studio:
                         return KKAPI.Studio.StudioAPI.StudioLoaded;
-                    case GameMode.Unknown: case GameMode.Maker: case GameMode.MainGame:
+                    case GameMode.Unknown:
+                    case GameMode.Maker:
+                    case GameMode.MainGame:
                         return false;
                     default:
                         return false;
                 }
             });
-            ConfigKey1 = Config.Bind("1. Roll", "Roll (clockwise)", new KeyboardShortcut(F4), new ConfigDescription("Keyboard shortcut to roll clockwise (right)"));
-            ConfigKey2 = Config.Bind("2. Front/Back", "Front/Back", new KeyboardShortcut(F6), new ConfigDescription("Keyboard shortcut to rotate into front/back"));
-            ConfigKey3 = Config.Bind("3. Side", "Side (clockwise)", new KeyboardShortcut(F7), new ConfigDescription("Keyboard shortcut to rotate to side in clockwise manner"));
-            
-            ConfigKeyC1 = Config.Bind("1. Roll", "Roll (counter-clockwise)", new KeyboardShortcut(F4, Ctrl), new ConfigDescription("Keyboard shortcut to roll counter-clockwise (left)"));
-            ConfigKeyC3 = Config.Bind("3. Side", "Side (counter-clockwise)", new KeyboardShortcut(F7, Ctrl), new ConfigDescription("Keyboard shortcut to rotate to side in counter-clockwise manner"));
-            
-            RollAngle = Config.Bind("1. Roll", "Roll Angle", Key1Default, new ConfigDescription("Roll angle", new AcceptableValueRange<float>(Key1Min, Key1Max)));
-            FrontBackAngle = Config.Bind("2. Front/Back", "Front/Back Angle (leave this be)", Key2Default, new ConfigDescription("No point adjusting this unless you don't want front/back", new AcceptableValueRange<float>(Key2Min, Key2Max)));
-            SideAngle = Config.Bind("3. Side", "Side Angle", Key3Default, new ConfigDescription("Angle to rotate to side", new AcceptableValueRange<float>(Key3Min, Key3Max)));
+            ConfigKey1 = Config.Bind("1. Roll", "Roll (clockwise)", new KeyboardShortcut(F4),
+                new ConfigDescription("Keyboard shortcut to roll clockwise (right)"));
+            ConfigKey2 = Config.Bind("2. Front/Back", "Front/Back", new KeyboardShortcut(F6),
+                new ConfigDescription("Keyboard shortcut to rotate into front/back"));
+            ConfigKey3 = Config.Bind("3. Side", "Side (clockwise)", new KeyboardShortcut(F7),
+                new ConfigDescription("Keyboard shortcut to rotate to side in clockwise manner"));
+
+            ConfigKeyC1 = Config.Bind("1. Roll", "Roll (counter-clockwise)", new KeyboardShortcut(F4, Ctrl),
+                new ConfigDescription("Keyboard shortcut to roll counter-clockwise (left)"));
+            ConfigKeyC3 = Config.Bind("3. Side", "Side (counter-clockwise)", new KeyboardShortcut(F7, Ctrl),
+                new ConfigDescription("Keyboard shortcut to rotate to side in counter-clockwise manner"));
+
+            RollAngle = Config.Bind("1. Roll", "Roll Angle", Key1Default,
+                new ConfigDescription("Roll angle", new AcceptableValueRange<float>(Key1Min, Key1Max)));
+            FrontBackAngle = Config.Bind("2. Front/Back", "Front/Back Angle (leave this be)", Key2Default,
+                new ConfigDescription("No point adjusting this unless you don't want front/back",
+                    new AcceptableValueRange<float>(Key2Min, Key2Max)));
+            SideAngle = Config.Bind("3. Side", "Side Angle", Key3Default,
+                new ConfigDescription("Angle to rotate to side", new AcceptableValueRange<float>(Key3Min, Key3Max)));
         }
 
         private void Update()
@@ -98,14 +111,15 @@ namespace HS2MultiAngleRotation
             {
                 z = 360 - z;
             }
-            Vector3 angle = new Vector3(CameraAngle.x, 180f, CameraAngle.z + z);
+
+            Vector3 angle = new Vector3(CameraAngle.x, CameraAngle.y, CalculateAngle(CameraAngle.z + z));
             CameraAngle = angle;
         }
 
         private void Yaw180()
         {
             float y = FrontBackAngle.Value;
-            Vector3 angle = new Vector3(CameraAngle.x, CameraAngle.y + y, CameraAngle.z);
+            Vector3 angle = new Vector3(CameraAngle.x, CalculateAngle(CameraAngle.y + y), CameraAngle.z);
             CameraAngle = angle;
         }
 
@@ -116,20 +130,27 @@ namespace HS2MultiAngleRotation
             {
                 y = 360 - y;
             }
-            Vector3 angle = new Vector3(CameraAngle.x, CameraAngle.y + y, CameraAngle.z);
+
+            Vector3 angle = new Vector3(CameraAngle.x, CalculateAngle(CameraAngle.y + y), CameraAngle.z);
             CameraAngle = angle;
         }
-        
-        private Studio.CameraControl CameraControl => (Studio.CameraControl)Camera.main.GetComponent<CinemachineBrain>().ActiveVirtualCamera;
+
+        private float CalculateAngle(float angle)
+        {
+            if (angle < 360f) return angle;
+            return angle - 360f;
+        }
+
+        private Studio.CameraControl CameraControl =>
+            (Studio.CameraControl) Camera.main.GetComponent<CinemachineBrain>().ActiveVirtualCamera;
 
         private Vector3 CameraAngle
         {
-            get => cameraAngle;
+            get => CameraControl.cameraAngle;
             set
             {
-                if (value == cameraAngle) return;
-                CameraControl.cameraAngle = value;
-                cameraAngle = value;
+                if (value == _cameraAngle) return;
+                CameraControl.cameraAngle = _cameraAngle = value;
             }
         }
     }
