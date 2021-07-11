@@ -42,6 +42,8 @@ namespace HS2MultiAngleRotation
         private const float Key3Default = 90f;
 
         private Vector3 _cameraAngle = new Vector3(0f, 0f, 0f);
+        
+        private bool _isLoaded;
 
         private IEnumerator Start()
         {
@@ -78,10 +80,14 @@ namespace HS2MultiAngleRotation
                     new AcceptableValueRange<float>(Key2Min, Key2Max)));
             SideAngle = Config.Bind("3. Side", "Side Angle", Key3Default,
                 new ConfigDescription("Angle to rotate to side", new AcceptableValueRange<float>(Key3Min, Key3Max)));
+
+            _isLoaded = true;
         }
 
         private void Update()
         {
+            if (!_isLoaded) return;
+            
             if (ConfigKey1.Value.IsDown())
             {
                 Roll();
